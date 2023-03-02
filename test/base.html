@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File Hosting Service Panel</title>
+    <link rel="stylesheet" type="text/css" href="base.css">
+    <script>
+        // Get the drop area element
+        var dropArea = document.getElementById("drop-area");
+
+        // Add event listeners for the drag and drop events
+        dropArea.addEventListener("dragenter", onDragEnter, false);
+        dropArea.addEventListener("dragover", onDragOver, false);
+        dropArea.addEventListener("drop", onDrop, false);
+
+        // Function to handle the dragenter event
+        function onDragEnter(event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
+
+        // Function to handle the dragover event
+        function onDragOver(event) {
+            event.stopPropagation();
+            event.preventDefault();
+            dropArea.style.pointerEvents = "auto";
+            event.dataTransfer.dropEffect = "copy";
+        }
+
+        function onDragLeave(event) {
+            event.stopPropagation();
+            event.preventDefault();
+            dropArea.style.pointerEvents = "none";
+        }
+
+
+        // Function to handle the drop event
+        function onDrop(event) {
+            event.stopPropagation();
+            event.preventDefault();
+
+            // Get the files that were dropped
+            var files = event.dataTransfer.files;
+
+            // Process the files
+            for (var i = 0; i < files.length; i++) {
+                // Do something with the file, for example, upload it
+                uploadFile(files[i]);
+            }
+        }
+
+        function uploadFile(file) {
+            // do something to upload the file
+            // e.g. use FormData and XMLHttpRequest to send the file to a server-side script
+        }
+    </script>
+</head>
+<body>
+<div id="drop-area"></div>
+<header>
+    <nav>
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">My Files</a></li>
+            <li><a href="#">Account</a></li>
+            <li><a href="#">Logout</a></li>
+        </ul>
+    </nav>
+</header>
+<main>
+    <h1>Welcome to Your File Hosting Service Panel</h1>
+    <section>
+        <h2>Upload a File</h2>
+        <form action="upload.php" method="post" enctype="multipart/form-data">
+            <input type="file" name="fileToUpload" id="fileToUpload">
+            <input type="submit" value="Upload" name="submit">
+        </form>
+    </section>
+
+    <section>
+        <h2>My Files</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>File Name</th>
+                <th>File Size</th>
+                <th>Upload Date</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td style="text-align: center;">example.jpg</td>
+                <td style="text-align: center;">5MB</td>
+                <td style="text-align: center;">01/01/2022</td>
+                <td style="text-align: center;">
+                    <a href="#">Download</a>
+                    <a href="#">Delete</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+<footer>
+    <p>Copyright © 2022 File Hosting Service</p>
+</footer>
+</body>
+</html>
