@@ -1,1 +1,161 @@
-page: /
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>File Hosting Service</title>
+    <script type="module">
+        import {
+            check_password,
+            check_login,
+            check_folder_name,
+            create_account_data,
+            compute_secret_keys,
+            decrypt_response_keys,
+            default as init
+        } from './res/xlix_sdk.js';
+
+        async function run() {
+            await init('./res/xlix_sdk_bg.wasm');
+
+            window.decrypt_response_keys = decrypt_response_keys;
+            window.compute_secret_keys = compute_secret_keys;
+            window.create_account_data = create_account_data;
+            window.check_login = check_login;
+            window.check_password = check_password;
+            window.check_folder_name = check_folder_name;
+        }
+
+        run();
+    </script>
+    <script>
+        function login(username, password) {
+            if (check_login(username) !== 0) {
+                return;
+            }
+
+            fetch(`/api/user?target=salt&l=${username}`)
+                .then(response => response.json())
+                .then(data => {
+                    let salt = data.String;
+
+                    let secret_keys = compute_secret_keys(salt, password);
+                    let auth_key = secret_keys.auth_key;
+
+                    fetch(`/api/user?target=auth&l=${username}&a=${encodeURIComponent(auth_key)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            let response_keys = JSON.stringify(data.Keys);
+                            let client_keys = decrypt_response_keys(response_keys, secret_keys.enc_key);
+                            window.session = client_keys.session;
+                            window.master = client_keys.master;
+                        });
+                });
+        }
+
+        function register(username, password) {
+            if (check_login(username) !== 0) {
+                return;
+            }
+
+            let account_data = create_account_data(username, password);
+
+            fetch('/api/user', {
+                method: 'POST',
+                body: account_data.to_json()
+            })
+                .then(response => response.json())
+                .then(data => {
+                    window.session = data.Session;
+                    window.master = account_data.master;
+                })
+                .catch(error => console.error(error));
+        }
+
+        function getFiles() {
+            // TODO: Implement get files API call
+        }
+
+        function uploadFile(file) {
+            // TODO: Implement upload file API call
+        }
+
+        function createFolder(folderName) {
+            // TODO: Implement create folder API call
+        }
+    </script>
+</head>
+<body>
+<h1>File Hosting Service</h1>
+<div id="login">
+    <h2>Login</h2>
+    <form onsubmit="login(this.username.value, this.password.value); return false;">
+        <label for="username">Username:</label>
+        <input type="text" name="username" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" name="password" required>
+        <br>
+        <button type="submit">Log In</button>
+    </form>
+</div>
+<div id="file-list">
+    <h2>Files</h2>
+    <ul id="file-list-items"></ul>
+</div>
+<div id="upload">
+    <h2>Upload File</h2>
+    <form onsubmit="uploadFile(this.file.files[0]); return false;">
+        <input type="file" name="file" required>
+        <br>
+        <button type="submit">Upload</button>
+    </form>
+</div>
+<div id="create-folder">
+    <h2>Create Folder</h2>
+    <form onsubmit="createFolder(this.folderName.value); return false;">
+        <label for="folderName">Folder Name:</label>
+        <input type="text" name="folderName" required>
+        <br>
+        <button type="submit">Create Folder</button>
+    </form>
+</div>
+<script>
+    // Example code for parsing API responses
+    function parseLoginResponse(response) {
+        // TODO: Implement parsing of login response JSON
+    }
+
+    function parseGetFilesResponse(response) {
+        // TODO: Implement parsing of get files response JSON
+    }
+
+    function parseUploadResponse(response) {
+        // TODO: Implement parsing of upload response JSON
+    }
+
+    function parseCreateFolderResponse(response) {
+        // TODO: Implement parsing of create folder response JSON
+    }
+
+    // Example code for updating the file list
+    function updateFileList(fileList) {
+        const fileListItems = document.getElementById("file-list-items");
+        fileListItems.innerHTML = "";
+        for (const file of fileList) {
+            const li = document.createElement("li");
+            li.textContent = file.name;
+            fileListItems.appendChild(li);
+        }
+    }
+
+    // Example code for logging in and getting files on page load
+    window.onload = function() {
+        // const loginResponse = login("example_username", "example_password");
+        // const loginData = parseLoginResponse(loginResponse);
+        // const filesResponse = getFiles(loginData.token);
+        // const fileList = parseGetFilesResponse(filesResponse);
+        // updateFileList(fileList);
+    }
+</script>
+</body>
+</html>
