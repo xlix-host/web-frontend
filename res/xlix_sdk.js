@@ -195,6 +195,20 @@ export function create_account_data(login, password) {
     return AccountData.__wrap(ret);
 }
 
+/**
+* @param {string} login
+* @param {string} auth_key
+* @returns {AuthData}
+*/
+export function create_auth_data(login, auth_key) {
+    const ptr0 = passStringToWasm0(login, wasm.__wbindgen_export_1, wasm.__wbindgen_export_2);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm0(auth_key, wasm.__wbindgen_export_1, wasm.__wbindgen_export_2);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.create_auth_data(ptr0, len0, ptr1, len1);
+    return AuthData.__wrap(ret);
+}
+
 function handleError(f, args) {
     try {
         return f.apply(this, args);
@@ -388,6 +402,90 @@ export class AccountData {
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
             wasm.accountdata_to_json(retptr, this.ptr);
+            var r0 = getInt32Memory0()[retptr / 4 + 0];
+            var r1 = getInt32Memory0()[retptr / 4 + 1];
+            return getStringFromWasm0(r0, r1);
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+            wasm.__wbindgen_export_0(r0, r1);
+        }
+    }
+}
+/**
+*/
+export class AuthData {
+
+    static __wrap(ptr) {
+        const obj = Object.create(AuthData.prototype);
+        obj.ptr = ptr;
+
+        return obj;
+    }
+
+    __destroy_into_raw() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+
+        return ptr;
+    }
+
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_authdata_free(ptr);
+    }
+    /**
+    * @returns {string}
+    */
+    get login() {
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            wasm.__wbg_get_accountdata_r_value(retptr, this.ptr);
+            var r0 = getInt32Memory0()[retptr / 4 + 0];
+            var r1 = getInt32Memory0()[retptr / 4 + 1];
+            return getStringFromWasm0(r0, r1);
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+            wasm.__wbindgen_export_0(r0, r1);
+        }
+    }
+    /**
+    * @param {string} arg0
+    */
+    set login(arg0) {
+        const ptr0 = passStringToWasm0(arg0, wasm.__wbindgen_export_1, wasm.__wbindgen_export_2);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.__wbg_set_accountdata_r_value(this.ptr, ptr0, len0);
+    }
+    /**
+    * @returns {string}
+    */
+    get auth() {
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            wasm.__wbg_get_accountdata_master(retptr, this.ptr);
+            var r0 = getInt32Memory0()[retptr / 4 + 0];
+            var r1 = getInt32Memory0()[retptr / 4 + 1];
+            return getStringFromWasm0(r0, r1);
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+            wasm.__wbindgen_export_0(r0, r1);
+        }
+    }
+    /**
+    * @param {string} arg0
+    */
+    set auth(arg0) {
+        const ptr0 = passStringToWasm0(arg0, wasm.__wbindgen_export_1, wasm.__wbindgen_export_2);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.__wbg_set_accountdata_master(this.ptr, ptr0, len0);
+    }
+    /**
+    * @returns {string}
+    */
+    to_json() {
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            wasm.authdata_to_json(retptr, this.ptr);
             var r0 = getInt32Memory0()[retptr / 4 + 0];
             var r1 = getInt32Memory0()[retptr / 4 + 1];
             return getStringFromWasm0(r0, r1);

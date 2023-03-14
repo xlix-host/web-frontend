@@ -9,6 +9,7 @@
             check_login,
             check_folder_name,
             create_account_data,
+            create_auth_data,
             compute_secret_keys,
             decrypt_response_keys,
             default as init
@@ -20,6 +21,7 @@
             window.decrypt_response_keys = decrypt_response_keys;
             window.compute_secret_keys = compute_secret_keys;
             window.create_account_data = create_account_data;
+            window.create_auth_data = create_auth_data;
             window.check_login = check_login;
             window.check_password = check_password;
             window.check_folder_name = check_folder_name;
@@ -33,15 +35,21 @@
                 return;
             }
 
-            fetch(`/api/user?target=salt&l=${username}`)
+            fetch(`/api/user?target=salt`, {
+                method: 'POST',
+                body: `"${username}"`
+            })
                 .then(response => response.json())
                 .then(data => {
                     let salt = data.String;
 
                     let secret_keys = compute_secret_keys(salt, password);
-                    let auth_key = secret_keys.auth_key;
+                    let auth_data = create_auth_data(username, secret_keys.auth_key)
 
-                    fetch(`/api/user?target=auth&l=${username}&a=${encodeURIComponent(auth_key)}`)
+                    fetch(`/api/user?target=auth`, {
+                        method: 'POST',
+                        body: auth_data.to_json()
+                    })
                         .then(response => response.json())
                         .then(data => {
                             let response_keys = JSON.stringify(data.Keys);
