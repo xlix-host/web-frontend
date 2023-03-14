@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Websocket Upload</title>
+    <script>
+        let ws;
+
+        function connectWebSocket() {
+            ws = new WebSocket("ws://127.0.0.1:6656"); // replace with your own host and port
+
+            ws.onopen = function() {
+                console.log("WebSocket connection established.");
+                ws.send("1"); // send "1" to server to initiate upload
+            };
+
+            ws.onmessage = function(event) {
+                console.log("Received message from server: " + event.data);
+                if (event.data === "ok") {
+                    console.log("Upload initialization successful.");
+                    let fileInput = document.getElementById("fileInput");
+                    let file = fileInput.files[0];
+                    let fileSize = file.size;
+                    let fileName = file.name;
+                    let fileExt = fileName.split(".").pop(); // extract file extension
+                    let fileKey = "<key>"; // replace with your own file key
+                    let session = "some_session_key"; // replace with your own session key
+                    let uploadInfo = {
+                        session: session,
+                        content_size: fileSize,
+                        file_name: fileName,
+                        file_ext: fileExt,
+                        file_key: fileKey
+                    };
+                    ws.send(JSON.stringify(uploadInfo)); // send upload info to server
+                } else {
+                    console.log("Error: unexpected response from server.");
+                }
+            };
+
+            ws.onerror = function(error) {
+                console.log("WebSocket error: " + error);
+            };
+
+            ws.onclose = function(event) {
+                console.log("WebSocket connection closed with code " + event.code);
+            };
+        }
+
+        function uploadFile() {
+            let fileInput = document.getElementById("fileInput");
+            let file = fileInput.files[0];
+            let chunkSize = 1024 * 1024 * 7; // 7MB chunk size
+            let offset = 0;
+            let reader = new FileReader();
+
+            reader.onload = function(event) {
+                if (ws.readyState === WebSocket.OPEN) {
+                    let data = event.target.result;
+                    ws.send(data); // send chunk to server
+                    offset += data.byteLength;
+                    if (offset < file.size) {
+                        sendNextChunk();
+                    }
+                }
+            };
+
+            function sendNextChunk() {
+                let blob = file.slice(offset, offset + chunkSize);
+                reader.readAsArrayBuffer(blob);
+            }
+
+            sendNextChunk();
+        }
+    </script>
+</head>
+<body>
+<input type="file" id="fileInput">
+<button onclick="connectWebSocket()">Upload</button>
+<button onclick="uploadFile()">Send File</button>
+</body>
+</html>
