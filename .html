@@ -60,6 +60,27 @@
                 });
         }
 
+        function change_password(username, new_password) {
+            if (check_login(username) !== 0) {
+                return;
+            }
+
+            let account_data = create_account_data(username, new_password);
+
+            fetch('/api/user', {
+                method: 'POST',
+                headers: {
+                    'session': window.session
+                },
+                body: account_data.to_json()
+            })
+                .then(response => response.json())
+                .then(data => {
+                    window.master = account_data.master;
+                })
+                .catch(error => console.error(error));
+        }
+
         function register(username, password) {
             if (check_login(username) !== 0) {
                 return;
