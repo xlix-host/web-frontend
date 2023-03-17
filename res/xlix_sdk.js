@@ -183,6 +183,23 @@ export function compute_secret_keys(salt, password) {
 
 /**
 * @param {string} login
+* @param {string} new_password
+* @param {string} old_decrypted_master
+* @returns {AccountData}
+*/
+export function update_account_data(login, new_password, old_decrypted_master) {
+    const ptr0 = passStringToWasm0(login, wasm.__wbindgen_export_1, wasm.__wbindgen_export_2);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm0(new_password, wasm.__wbindgen_export_1, wasm.__wbindgen_export_2);
+    const len1 = WASM_VECTOR_LEN;
+    const ptr2 = passStringToWasm0(old_decrypted_master, wasm.__wbindgen_export_1, wasm.__wbindgen_export_2);
+    const len2 = WASM_VECTOR_LEN;
+    const ret = wasm.update_account_data(ptr0, len0, ptr1, len1, ptr2, len2);
+    return AccountData.__wrap(ret);
+}
+
+/**
+* @param {string} login
 * @param {string} password
 * @returns {AccountData}
 */

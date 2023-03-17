@@ -8,6 +8,7 @@
             check_password,
             check_login,
             check_folder_name,
+            update_account_data,
             create_account_data,
             create_auth_data,
             compute_secret_keys,
@@ -20,6 +21,7 @@
 
             window.decrypt_response_keys = decrypt_response_keys;
             window.compute_secret_keys = compute_secret_keys;
+            window.update_account_data = update_account_data;
             window.create_account_data = create_account_data;
             window.create_auth_data = create_auth_data;
             window.check_login = check_login;
@@ -65,7 +67,11 @@
                 return;
             }
 
-            let account_data = create_account_data(username, new_password);
+            if (window.master == null || window.master === "") {
+                return;
+            }
+
+            let account_data = update_account_data(username, new_password, window.master);
 
             fetch('/api/user', {
                 method: 'POST',
@@ -76,7 +82,7 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    window.master = account_data.master;
+                    login(username, new_password);
                 })
                 .catch(error => console.error(error));
         }
